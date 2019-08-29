@@ -29,11 +29,15 @@ func (h *ScaleHandler) scaleJobs(scaledObject *keda_v1alpha1.ScaledObject, isAct
 func (h *ScaleHandler) createJobs(scaledObject *keda_v1alpha1.ScaledObject, scaleTo int64, maxScale int64) {
 	var containers []apiv1.Container
 	for _, c := range scaledObject.Spec.ConsumerSpec.Containers {
-		containers = append(containers, apiv1.Container{
-			Name:  c.Name,
-			Image: c.Image,
-			Env:   c.Env,
-		})
+		containers = append(containers, c)
+	}
+
+	labels := map[string]string{
+		"scaledobject": scaledObject.GetName(),
+	}
+
+	for k, v := range scaledObject.GetLabels() {
+		labels[k] = v
 	}
 
 	if scaleTo > maxScale {
@@ -47,17 +51,13 @@ func (h *ScaleHandler) createJobs(scaledObject *keda_v1alpha1.ScaledObject, scal
 			ObjectMeta: meta_v1.ObjectMeta{
 				GenerateName: scaledObject.GetName() + "-",
 				Namespace:    scaledObject.GetNamespace(),
-				Labels: map[string]string{
-					"scaledobject": scaledObject.GetName(),
-				},
+				Labels:       labels,
 			},
 			Spec: batchv1.JobSpec{
 				Template: apiv1.PodTemplateSpec{
 					ObjectMeta: meta_v1.ObjectMeta{
 						GenerateName: scaledObject.GetName() + "-",
-						Labels: map[string]string{
-							"scaledobject": scaledObject.GetName(),
-						},
+						Labels:       labels,
 					},
 					Spec: apiv1.PodSpec{
 						RestartPolicy: apiv1.RestartPolicyOnFailure,
