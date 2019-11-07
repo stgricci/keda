@@ -1,6 +1,5 @@
-| Branch | Status |
-|--------|--------|
-| master |[![CircleCI](https://circleci.com/gh/kedacore/keda.svg?style=svg&circle-token=1c70b5074bceb569aa5e4ac9a1b43836ffe25f54)](https://circleci.com/gh/kedacore/keda)|
+[![](https://github.com/kedacore/keda/workflows/master%20build/badge.svg)](https://github.com/kedacore/keda/actions)
+
 
 <p align="center"><img src="images/keda-logo-transparent.png" width="300"/></p>
 <p style="font-size: 25px" align="center"><b>Kubernetes-based Event Driven Autoscaling</b></p>
@@ -65,9 +64,12 @@ func kubernetes install --namespace keda
 ```
 
 ### Deploying using the deploy yaml
-If you want to try KEDA on minikube or a different Kubernetes deployment without using Helm, you can deploy the yaml under the `/deploy` directory.
+If you want to try KEDA on minikube or a different Kubernetes deployment without using Helm, you can deploy CRD and yamls under the `/deploy` directory.
 ```
-kubectl apply -f KedaScaleController.yaml
+kubectl create namespace keda
+kubectl apply -f deploy/crds/keda.k8s.io_scaledobjects_crd.yaml
+kubectl apply -f deploy/crds/keda.k8s.io_triggerauthentications_crd.yaml
+kubectl apply -f deploy/
 ```
 
 ## How KEDA works
@@ -88,6 +90,7 @@ KEDA has a number of "scalers" that can both detect if a deployment should be ac
 * GCP PubSub
 * Kafka
 * Liiklus
+* Nats Streaming
 * Prometheus
 * RabbitMQ
 * Redis Lists
@@ -130,12 +133,12 @@ Zoom link: [https://zoom.us/j/150360492 ](https://zoom.us/j/150360492 )
 Meeting agenda: [https://hackmd.io/s/r127ErYiN](https://hackmd.io/s/r127ErYiN)
 
 ## Building
+This project is using [Operator SDK framework](https://github.com/operator-framework/operator-sdk) v0.11.0.
 
 ```bash
 git clone git@github.com:kedacore/keda.git
 cd keda
 make build
-./dist/keda
 ```
 
 # Contributing
